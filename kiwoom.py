@@ -1,5 +1,6 @@
 import sys
 import logging
+from pprint import pprint
 
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 from PyQt5.QAxContainer import QAxWidget
@@ -100,8 +101,9 @@ class Kiwoom():
         음수인 경우는 에러 코드 참조
         """
         logger.debug(nErrCode)
-        self.SetInputValue("종목코드", "078890")
-        self.CommRqData("Request1", "opt10001", 0, "0101")
+        self.get_login_info()
+        # self.SetInputValue("종목코드", "078890")
+        # self.CommRqData("Request1", "opt10001", 0, "0101")
 
     def OnReceiveRealCondition(self, strCode, strType, strConditionName, strConditionIndex):
         """OnReceiveRealCondition: 조건검색 실시간 편입,이탈 종목을 받을 시점을 알려준다.
@@ -136,7 +138,7 @@ class Kiwoom():
         logger.debug(lRet, sMsg)
 
 
-    def CommConnect(self):
+    def login(self):
         """CommConnect: 로그인 윈도우를 실행
         원형: LONG CommConnect()
         설명: 로그인 윈도우를 실행한다.
@@ -144,33 +146,37 @@ class Kiwoom():
         반환값: 0 - 성공, 음수값은 실패
         비고: 로그인이 성공하거나 실패하는 경우 OnEventConnect 이벤트가 발생하고 이벤트의 인자 값으로 로그인 성공 여부를 알 수 있다.
         """
-        result = self.kiwoom.CommConnect()
-        logger.debug(result)
+        connect_result = self.kiwoom.CommConnect()
+        if connect_result == 0:
+            print("로그인 윈도우 실행 성공")
+        else:
+            print("로그인 윈도우 실행 실패")
 
     def get_connect_state(self):
-        pass
+        """현재접속상태를 반환"""
+        connect_state = self.kiwoom.GetConnectState()
+        if connect_state == 0:
+            print("미연결")
+        elif connect_state == 1:
+            print("연결완료")
 
-    def GetLoginInfo(self, sTag):
-        """GetLoginInfo: 로그인 정보를 반환
-        ## 원형
-        BSTR GetLoginInfo(BSTR sTag)
-        ## 설명
-        로그인한 사용자 정보를 반환한다.
-        ## 입력값
-        - BSTR sTag : 사용자 정보 구분 TAG값 (비고)
-        ## 반환값
-        - TAG값에 따른 데이터 반환
-        ## 비고
-        BSTR sTag에 들어 갈 수 있는 값은 아래와 같음
+    def get_login_info(self):
+        """로그인 정보를 반환
+
         - “ACCOUNT_CNT” – 전체 계좌 개수를 반환한다.
         - "ACCNO" – 전체 계좌를 반환한다. 계좌별 구분은 ‘;’이다.
         - “USER_ID” - 사용자 ID를 반환한다.
         - “USER_NAME” – 사용자명을 반환한다.
         - “KEY_BSECGB” – 키보드보안 해지여부. 0:정상, 1:해지
         - “FIREW_SECGB” – 방화벽 설정 여부. 0:미설정, 1:설정, 2:해지
-        Ex) openApi.GetLoginInfo(“ACCOUNT_CNT”);
         """
-        pass
+        account_cnt = self.kiwoom.GetLoginInfo("ACCOUNT_CNT")
+        accno = self.kiwoom.GetLoginInfo("ACCNO")
+        user_id = self.kiwoom.GetLoginInfo("USER_ID")
+        user_name = self.kiwoom.GetLoginInfo("USER_NAME")
+        key_bsecgb = self.kiwoom.GetLoginInfo("KEY_BSECGB")
+        firew_secgb = self.kiwoom.GetLoginInfo("FIREW_SECGB")
+        pprint(dict(account_cnt=account_cnt, accno=accno, user_id=user_id, user_name=user_name, key_bsecgb=key_bsecgb, firew_secgb=firew_secgb))
 
     def CommRqData(self, sRQName, sTrCode, nPrevNext, sScreenNo):
         """CommRqData: 통신 데이터를 송신

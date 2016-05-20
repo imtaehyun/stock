@@ -11,11 +11,8 @@ class MyWindow(QMainWindow):
 
         self.initUI()
 
-        # self.kiwoom = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
-        # self.kiwoom.CommConnect()
-        # self.kiwoom.OnEventConnect[int].connect(self.onEventConnect)
         self.kiwoom = Kiwoom()
-        self.kiwoom.CommConnect()
+        self.kiwoom.login()
 
     def initUI(self):
         self.setWindowTitle("키움증권 테스트")
