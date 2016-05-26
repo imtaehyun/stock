@@ -2,22 +2,18 @@ import sys
 import logging
 from pprint import pprint
 from LogHandler import LogHandler
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QTableWidget, QTableView, QTableWidgetItem
 from PyQt5.QAxContainer import QAxWidget
+from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
-# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# streamHandler = logging.StreamHandler()
-# streamHandler.setFormatter(formatter)
-# logger.addHandler(streamHandler)
 
 
 class Kiwoom():
     def __init__(self, view):
 
-        self.view = view;
+        self.view = view
 
         # Logger 초기화
         logHandler = LogHandler(self.view)
@@ -37,8 +33,17 @@ class Kiwoom():
         self.kiwoom.OnReceiveTrCondition[str, str, str, int, int].connect(self.OnReceiveTrCondition)
         self.kiwoom.OnReceiveConditionVer[int, str].connect(self.OnReceiveConditionVer)
 
+### Event Handlers
 
-### Event Handler
+    def load_stock_list(self):
+        stock_list = self.get_jongmok_code()
+
+        for stock in stock_list:
+            row = self.view.tableWidget.rowCount()
+            self.view.tableWidget.insertRow(row)
+            self.view.tableWidget.setItem(row, 0, QTableWidgetItem(stock['code']))
+            self.view.tableWidget.setItem(row, 1, QTableWidgetItem(stock['name']))
+
 
     def OnEventConnect(self, nErrCode):
         """OnEventConnect: 서버 접속 관련 이벤트
@@ -49,12 +54,16 @@ class Kiwoom():
         nErrCode가 0이면 로그인 성공, 음수면 실패
         음수인 경우는 에러 코드 참조
         """
-        print('OnEventConnect: ', dict(nErrCode=nErrCode))
+        logger.debug('OnEventConnect: ', dict(nErrCode=nErrCode))
 
         if nErrCode == 0:
-            self.view.logBrowser.append("로그인 성공")
+            logger.info("로그인 성공")
+
+            # 로그인 성공시 종목코드 가져와서 TableView에 노출해줌
+            self.load_stock_list()
+
         else:
-            self.view.logBrowser.append("로그인 실패: " + nErrCode)
+            logger.info("로그인 실패: " + str(nErrCode))
         # self.get_login_info()
         # self.SetInputValue("종목코드", "078890")
         # self.CommRqData("Request1", "opt10001", 0, "0101")
@@ -155,9 +164,9 @@ class Kiwoom():
         """
         connect_result = self.kiwoom.CommConnect()
         if connect_result == 0:
-            print("로그인 윈도우 실행 성공")
+            logger.debug("로그인 윈도우 실행 성공")
         else:
-            print("로그인 윈도우 실행 실패")
+            logger.debug("로그인 윈도우 실행 실패")
 
     def get_connect_state(self):
         """현재접속상태를 반환"""
@@ -188,7 +197,7 @@ class Kiwoom():
         accno = ret_accno.split(';')[:len(ret_accno.split(';'))-1]
 
         login_info = dict(account_cnt=account_cnt, accno=accno, user_id=user_id, user_name=user_name, key_bsecgb=key_bsecgb, firew_secgb=firew_secgb)
-        print('login_info: ', login_info)
+        logger.info('login_info: ', str(login_info))
 
         return login_info
 
@@ -199,7 +208,7 @@ class Kiwoom():
         for code in codes:
             name = self.kiwoom.GetMasterCodeName(code)
             stock_list.append(dict(code=code,name=name))
-        print(stock_list)
+        # print(stock_list)
         return stock_list
 
     def CommRqData(self, sRQName, sTrCode, nPrevNext, sScreenNo):
