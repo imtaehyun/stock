@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>906</width>
+    <height>660</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>321</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>로그인</string>
+    </property>
+    <widget class="QWidget" name="gridLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>221</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="ipt_login_certpwd">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="label_login_certpwd">
+        <property name="text">
+         <string>인증서비번</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="ipt_login_pwd">
+        <property name="maxLength">
+         <number>8</number>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="label_login_pwd">
+        <property name="text">
+         <string>비밀번호</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="ipt_login_acctpwd">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QLabel" name="label_login_acctpwd">
+        <property name="text">
+         <string>계좌번호비번</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="ipt_login_id">
+        <property name="maxLength">
+         <number>8</number>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="3">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCheckBox" name="check_test_acct">
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
+          <property name="text">
+           <string>모의</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_login">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>로그인</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_logout">
+          <property name="text">
+           <string>로그아웃</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_login_id">
+        <property name="text">
+         <string>아이디</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>270</y>
+      <width>881</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>로그</string>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="gridLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>861</width>
+       <height>301</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QTextBrowser" name="log"/>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>906</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <tabstops>
+  <tabstop>ipt_login_id</tabstop>
+  <tabstop>ipt_login_pwd</tabstop>
+  <tabstop>ipt_login_certpwd</tabstop>
+  <tabstop>ipt_login_acctpwd</tabstop>
+  <tabstop>check_test_acct</tabstop>
+  <tabstop>btn_login</tabstop>
+  <tabstop>btn_logout</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btn_login</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>login()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>116</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_test_acct</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>change_acct_type(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>70</x>
+     <y>341</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn_logout</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>logout()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>220</x>
+     <y>304</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>login()</slot>
+  <slot>change_acct_type(bool)</slot>
+  <slot>logout()</slot>
+ </slots>
+</ui>
