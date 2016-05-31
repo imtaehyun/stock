@@ -23,10 +23,10 @@ class XASession:
         self.session = win32com.client.DispatchWithEvents("XA_Session.XASession", XASessionEvents) # XASession 초기화
 
     def login(self, server, user):
-        print("server: {}:{}".format(server["address"], server["port"]))
+        print("server: {}:{}".format(server["host"], server["port"]))
         print("user: ", str(user))
 
-        connectResult = self.session.ConnectServer(server["address"], server["port"])
+        connectResult = self.session.ConnectServer(server["host"], server["port"])
 
         if not connectResult:
             print(self.session.GetLastError())

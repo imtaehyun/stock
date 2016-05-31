@@ -3,6 +3,7 @@ import logging
 from config import StockConfig
 from datetime import datetime
 from ebest.xasession import XASession
+from ebest.xaquery import XAQuery
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QCheckBox
 from PyQt5 import uic
 
@@ -40,24 +41,29 @@ class StockWindow(QMainWindow):
         self.view.check_test_acct.setChecked(self.server["host"] == "demo.ebestsec.co.kr")
 
     def login(self):
-        self.user = {
-            "id": self.view.ipt_login_id.text(),
-            "pwd": self.view.ipt_login_pwd.text(),
-            "certpwd": self.view.ipt_login_certpwd.text(),
-            "acctpwd": self.view.ipt_login_acctpwd.text()
-        }
+        try :
+            self.user = {
+                "id": self.view.ipt_login_id.text(),
+                "pwd": self.view.ipt_login_pwd.text(),
+                "certpwd": self.view.ipt_login_certpwd.text(),
+                "acctpwd": self.view.ipt_login_acctpwd.text()
+            }
 
-        is_login = self.session.login(self.server, self.user)
+            is_login = self.session.login(self.server, self.user)
 
-        if is_login:
-            # config파일 생성
-            self.stockConfig.save(user=self.user, server=self.server)
+            if is_login:
+                # config파일 생성
+                self.stockConfig.save(user=self.user, server=self.server)
 
-            # input들 모두 read only 처리
+                # input들 모두 read only 처리
 
-            # 로그인/로그아웃버튼 처리
-            self.view.btn_login.setEnabled(False)
-            self.view.btn_logout.setEnabled(True)
+                # 로그인/로그아웃버튼 처리
+                self.view.btn_login.setEnabled(False)
+                self.view.btn_logout.setEnabled(True)
+
+                query = XAQuery()
+        except Exception as e:
+            print(e)
 
     def logout(self):
 
