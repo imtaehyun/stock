@@ -15,6 +15,9 @@ class StockWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.user = None
+        self.server = None
+
         self.view = uic.loadUi('stock.ui', self)  # ui load
         self.stockConfig = StockConfig()  # config init
 
@@ -53,7 +56,7 @@ class StockWindow(QMainWindow):
 
             if is_login:
                 # config파일 생성
-                self.stockConfig.save(user=self.user, server=self.server)
+                # self.stockConfig.save(user=self.user, server=self.server)
 
                 # input들 모두 read only 처리
 
@@ -61,7 +64,14 @@ class StockWindow(QMainWindow):
                 self.view.btn_login.setEnabled(False)
                 self.view.btn_logout.setEnabled(True)
 
-                query = XAQuery()
+                XAQuery('t1102').request({
+                    "InBlock": {
+                        "shcode": "078020"
+                    }
+                }, {
+                    "OutBlock": ("hname", "price", "sign")
+                })
+
         except Exception as e:
             print(e)
 
