@@ -1,5 +1,6 @@
 import win32com.client
 import pythoncom
+from pandas import Series, DataFrame
 
 class XAQueryEvents:
     def __init__(self):
@@ -40,13 +41,14 @@ class XAQueryEvents:
         """
         print("OnReceiveChartRealData: ", szTrCode)
 
-class XAQuery:
 
-    def __init__(self, req_cd):
+class XAQuery:
+    def __init__(self, req_cd, is_occur=False):
         try:
             self.query = win32com.client.DispatchWithEvents("XA_DataSet.XAQuery", XAQueryEvents)
             self.query.LoadFromResFile("Res/" + req_cd + ".res")
             self.req_cd = req_cd
+            self.is_occur = is_occur
         except Exception as e:
             print(e)
 
@@ -82,10 +84,14 @@ class XAQuery:
             print("result: ", self.output)
 
             for k, v in self.output.items():
-                for col in v.keys():
-                    v[col] = self.query.GetFieldData(self.req_cd + k, col, 0)
+                count = self.query.GetBlockCount(self.req_cd + k)
+                print("count: ", count)
+                for i in range(count):
+                    for col in v.keys():
+                        v[col] = self.query.GetFieldData(self.req_cd + k, col, i)
+                    print("result: ", self.output)
 
-            print("result: ", self.output)
+
             return self.output
 
         except Exception as e:
