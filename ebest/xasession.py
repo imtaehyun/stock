@@ -23,19 +23,20 @@ class XASession:
         self.session = win32com.client.DispatchWithEvents("XA_Session.XASession", XASessionEvents) # XASession 초기화
 
     def login(self, server, user):
+        """로그인"""
         print("server: {}:{}".format(server["host"], server["port"]))
         print("user: ", str(user))
 
         connectResult = self.session.ConnectServer(server["host"], server["port"])
 
         if not connectResult:
-            print(self.session.GetLastError())
+            print("Connect Server Error: ", self.session.GetLastError())
             return False
 
         loginResult = self.session.Login(user["id"], user["pwd"], user["certpwd"], 0, False)
 
         if not loginResult:
-            print(self.session.GetLastError())
+            print("Login Error: ", loginResult, self.session.GetLastError())
             return False
 
         while self.session.code == -1:
@@ -49,11 +50,12 @@ class XASession:
             return False
 
     def logout(self):
+        """로그아웃"""
         print("로그아웃")
         self.session.DisconnectServer()
 
     def account(self):
-
+        """사용자 계좌번호 리스트 가져오기"""
         acc = []
         for i in range(self.session.GetAccountListCount()):
             acc.append({
