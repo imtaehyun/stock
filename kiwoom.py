@@ -2,6 +2,7 @@ import sys
 import logging
 from pprint import pprint
 from LogHandler import LogHandler
+import kiwoom.code_util as code_util
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QTableWidget, QTableView, QTableWidgetItem
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 class Kiwoom():
     def __init__(self, view):
 
+        self.user = None
         self.view = view
 
         # Logger 초기화
@@ -35,16 +37,6 @@ class Kiwoom():
 
 ### Event Handlers
 
-    def load_stock_list(self):
-        stock_list = self.get_jongmok_code()
-
-        for stock in stock_list:
-            row = self.view.tableWidget.rowCount()
-            self.view.tableWidget.insertRow(row)
-            self.view.tableWidget.setItem(row, 0, QTableWidgetItem(stock['code']))
-            self.view.tableWidget.setItem(row, 1, QTableWidgetItem(stock['name']))
-
-
     def OnEventConnect(self, nErrCode):
         """OnEventConnect: 서버 접속 관련 이벤트
         입력값
@@ -60,10 +52,14 @@ class Kiwoom():
             logger.info("로그인 성공")
 
             # 로그인 성공시 종목코드 가져와서 TableView에 노출해줌
-            self.load_stock_list()
+            # self.load_stock_list()
+
+            self.user = self.get_login_info()
+            self.order()
 
         else:
             logger.info("로그인 실패: " + str(nErrCode))
+            self.user = None
         # self.get_login_info()
         # self.SetInputValue("종목코드", "078890")
         # self.CommRqData("Request1", "opt10001", 0, "0101")
@@ -107,7 +103,13 @@ class Kiwoom():
         sRQName . CommRqData의 sRQName 와 매핑된다.
         sTrCode . CommRqData의 sTrCode 와 매핑된다.
         """
-        logger.debug(sScrNo, sRQName, sTrCode, sMsg)
+        print("-----------------------")
+        print("- OnReceiveMsg: ", dict(sScrNo=sScrNo, sRQName=sRQName, sTrCode=sTrCode, sMsg=sMsg))
+        print("화면번호: ", sScrNo)
+        print("사용자구분명: ", sRQName)
+        print("Tran 명: ", sTrCode)
+        print("서버메시지: ", sMsg)
+        print("-----------------------")
 
     def OnReceiveChejanData(self, sGubun, nItemCnt, sFidList):
         """OnReceiveChejanData: 체결데이터를 받은 시점을 알려준다.
@@ -120,7 +122,15 @@ class Kiwoom():
         sGubun . 0:주문체결통보, 1:잔고통보, 3:특이신호
         sFidList . 데이터 구분은 ‘;’ 이다.
         """
-        logger.debug(sGubun, nItemCnt, sFidList)
+        gubun = { "0": "주문체결통보", "1": "잔고통보", "3": "특이신호" }
+
+        print("-----------------------")
+        print("- OnReceiveChejanData: ", dict(sGubun=sGubun, nItemCnt=nItemCnt, sFidList=sFidList))
+        print("체결구분: ", gubun[sGubun])
+        print("아이템갯수: ", nItemCnt)
+        for fid in sFidList.split(";"):
+            print("{}: {}".format(code_util.get_fid_msg(fid), self.kiwoom.GetChejanData(fid)))
+        print("-----------------------")
 
     def OnReceiveRealCondition(self, strCode, strType, strConditionName, strConditionIndex):
         """OnReceiveRealCondition: 조건검색 실시간 편입,이탈 종목을 받을 시점을 알려준다.
@@ -197,7 +207,7 @@ class Kiwoom():
         accno = ret_accno.split(';')[:len(ret_accno.split(';'))-1]
 
         login_info = dict(account_cnt=account_cnt, accno=accno, user_id=user_id, user_name=user_name, key_bsecgb=key_bsecgb, firew_secgb=firew_secgb)
-        logger.info('login_info: ', str(login_info))
+        print('login_info: ', login_info)
 
         return login_info
 
@@ -207,7 +217,7 @@ class Kiwoom():
         codes = code_list.split(';')[:len(code_list.split(';'))-1]
         for code in codes:
             name = self.kiwoom.GetMasterCodeName(code)
-            stock_list.append(dict(code=code,name=name))
+            stock_list.append(dict(code=code, name=name))
         # print(stock_list)
         return stock_list
 
@@ -318,4 +328,9 @@ class Kiwoom():
         """
         result = self.kiwoom.CommGetData(sJongmokCode, "", sFieldName, 0, sInnerFieldName)
         print("CommGetData: ", dict(result=result))
+
+    def order(self):
+        req_name = "ORD" + "001"
+
+        self.kiwoom.SendOrder(req_name, "0000", self.user['accno'][0], 1, "078890", 10, 0, "03", "")
 
